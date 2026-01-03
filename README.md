@@ -96,4 +96,45 @@ export const connectWebSocketForChatList = ({ onMessage, onSeen }) => {
             }
         }
     }, [])
+```
 
+# Update new mast on cach on tanstack query
+```jsx
+ // ..............**Connecting to WebSocket**..................\\
+  useEffect(() => {
+    if (!chatRoom) return;
+
+    socketRef.current = connectWebSocketForChat({
+      roomId: chatRoom,
+
+      onMessage: (message) => {
+        console.log("New msg arives Chatpanel:", message)
+        if (message.type !== 'message') return;
+
+        const newMessage = message.data;
+        // Updated messages and cache with new message
+        queryClient.setQueryData(
+          ['messages', chatRoom],
+          (oldMessages = []) => {
+            // Safety: ensure array
+            if (!Array.isArray(oldMessages)) return oldMessages;
+
+            // Prevent duplicate messages
+            const alreadyExists = oldMessages.some(
+              msg => msg.id === newMessage.id
+            );
+
+            if (alreadyExists) return oldMessages;
+
+            // Add new message to TOP (newest first)
+            return [newMessage, ...oldMessages];
+          }
+        );
+      },
+    });
+
+    return () => {
+      socketRef.current?.close();
+    };
+  }, [chatRoom, queryClient]);
+```
