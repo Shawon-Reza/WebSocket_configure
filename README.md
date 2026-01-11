@@ -98,7 +98,7 @@ export const connectWebSocketForChatList = ({ onMessage, onSeen }) => {
     }, [])
 ```
 
-# Update new mast on cach on tanstack query
+# Update new msg on cach on tanstack query
 ```jsx
  // ..............**Connecting to WebSocket**..................\\
   useEffect(() => {
