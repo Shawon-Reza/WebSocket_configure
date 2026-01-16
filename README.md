@@ -97,6 +97,37 @@ export const connectWebSocketForChatList = ({ onMessage, onSeen }) => {
         }
     }, [])
 ```
+# Getting Old msg
+
+```jsx
+ // Messages (HTTP with infinite scroll)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["messages", chatRoom],
+    enabled: !!chatRoom,
+    queryFn: async ({ pageParam = null }) => {
+      const res = await axiosApi.get(
+        `/api/v1/rooms/${chatRoom}/messages/`,
+        { params: { cursor: pageParam } }
+      );
+
+      return {
+        results: res.data.results ?? [],
+        nextCursor: res.data.next_cursor ?? null,
+        chatInfo: res.data.room ?? null,
+      };
+    },
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+  });
+
+  console.log("Result--------------:", data)
+  console.log("Result*************:", data?.pages[0].chatInfo)
+```
+
 
 # Update new msg on cach on tanstack query
 ```jsx
